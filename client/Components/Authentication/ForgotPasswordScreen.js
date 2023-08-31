@@ -23,7 +23,10 @@ export default function ForgotPasswordScreen({ navigation }) {
             <TouchableOpacity style={styles.button} onPress={handlePasswordRecovery}>
                 <Text style={styles.buttonText}>Recover Password</Text>
             </TouchableOpacity>
-            {/* Navigation to other screens can be added here */}
+
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.backButtonText}>Back to Login</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -61,11 +64,22 @@ const styles = StyleSheet.create({
         padding: 15,
         backgroundColor: '#4CAF50',
         borderRadius: 25,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 10  // Added margin to separate from the back button
     },
     buttonText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#fff'
+    },
+    backButton: {
+        width: '100%',
+        padding: 10,
+        alignItems: 'center',
+        marginTop: 5  // Added for spacing
+    },
+    backButtonText: {
+        fontSize: 16,
+        color: '#4CAF50'
     }
 });

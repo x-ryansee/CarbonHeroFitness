@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Button, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, FlatList, Alert } from 'react-native';
 
 export default function ProfileScreen({ navigation }) {
     const [userData, setUserData] = useState({
@@ -14,6 +14,26 @@ export default function ProfileScreen({ navigation }) {
         },
         achievements: ['First Ride', '100km Club', 'Eco Hero']
     });
+
+    const handleLogout = () => {
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Logout',
+                    onPress: () => {
+                        // Here, perform logout operations
+                        navigation.navigate('Login'); // Navigate back to Login or any relevant screen
+                    }
+                }
+            ]
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -51,6 +71,7 @@ export default function ProfileScreen({ navigation }) {
 
             <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
             <Button title="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
+            <Button title="Logout" onPress={handleLogout} color="red" />
         </View>
     );
 }

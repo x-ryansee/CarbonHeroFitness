@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 
@@ -8,6 +8,7 @@ export default function RecordScreen() {
     const [route, setRoute] = useState([]);
     const [tracking, setTracking] = useState(false);
     const [distance, setDistance] = useState(0);
+    const [transport, setTransport] = useState(null); // Added state for transport mode
     let watchId;
 
     const startTracking = async () => {
@@ -56,6 +57,10 @@ export default function RecordScreen() {
                          Math.pow(point2.longitude - point1.longitude, 2));
     };
 
+
+
+    // ... [rest of your functions unchanged]
+
     return (
         <View style={styles.container}>
             <MapView 
@@ -71,10 +76,30 @@ export default function RecordScreen() {
             >
                 {route.length > 0 && <Polyline coordinates={route} />}
             </MapView>
-            <Button 
-                title={tracking ? "Stop Tracking" : "Start Tracking"} 
-                onPress={() => { tracking ? stopTracking() : startTracking() }} 
-            />
+
+            {/* Transport Selection */}
+            <View style={styles.transportSelection}>
+                <TouchableOpacity 
+                    style={[styles.transportButton, transport === 'walk' ? styles.active : {}]}
+                    onPress={() => setTransport('walk')}
+                >
+                    <Text style={styles.buttonText}>Walk</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.transportButton, transport === 'bike' ? styles.active : {}]}
+                    onPress={() => setTransport('bike')}
+                >
+                    <Text style={styles.buttonText}>Bike</Text>
+                </TouchableOpacity>
+            </View>
+
+            {transport && (
+                <Button 
+                    title={tracking ? "Stop Tracking" : "Start Tracking"} 
+                    onPress={() => { tracking ? stopTracking() : startTracking() }} 
+                />
+            )}
+
             {distance !== 0 && (
                 <>
                     <Text>Distance Travelled: {distance.toFixed(2)} km</Text>
@@ -94,5 +119,24 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '70%',
+    },
+    transportSelection: {
+        flexDirection: 'row',
+        marginVertical: 10,
+    },
+    transportButton: {
+        padding: 10,
+        marginHorizontal: 10,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        backgroundColor: '#fff',
+    },
+    active: {
+        backgroundColor: '#4CAF50',
+    },
+    buttonText: {
+        color: '#333',
+        fontSize: 16,
     }
 });

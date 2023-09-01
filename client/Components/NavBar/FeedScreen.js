@@ -5,17 +5,26 @@ export default function FeedScreen() {
     const [activities, setActivities] = useState([]);
 
     useEffect(() => {
-        // Fetch activities data here
-
-        // This is mock data. Replace with an API call to fetch real data.
         const fetchData = async () => {
-            const mockActivities = [
-                { id: '1', user: 'John Doe', activity: 'Cycled 5 miles' },
-                { id: '2', user: 'Alice', activity: 'Walked 2 miles' },
-                // ... add more mock activities
-            ];
+            try {
+                const response = await fetch('http://localhost:8000/api/path_to_your_activities_endpoint/');
 
-            setActivities(mockActivities);
+                if (!response.ok) {
+                    console.error("There was a problem fetching the data.");
+                    return;
+                }
+
+                const data = await response.json();
+                const formattedActivities = data.map(activity => ({
+                    id: activity.id.toString(),
+                    user: activity.user.name, // Adjust based on your backend's response structure
+                    activity: `${activity.name} ${activity.distance} miles`, // Assuming your activity has a 'name' and 'distance'
+                }));
+
+                setActivities(formattedActivities);
+            } catch (error) {
+                console.error("There was an error:", error);
+            }
         };
 
         fetchData();

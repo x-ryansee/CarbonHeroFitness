@@ -9,7 +9,7 @@ export default function ProfileScreen({ navigation }) {
         following: 85,
         profileImage: 'URL_TO_PROFILE_IMAGE',
         stats: {
-            distanceCovered: 250, // in kilometers
+            distanceCovered: 250, // in km
             carbonSaved: 50, // in kg
         },
         achievements: ['First Ride', '100km Club', 'Eco Hero']

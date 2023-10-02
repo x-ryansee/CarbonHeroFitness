@@ -1,48 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
+
+const PAGE_SIZE = 20;
 
 export default function FeedScreen() {
-    const [activities, setActivities] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchUsers = useCallback(async (pageNum = 1) => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/carbonherofitness/users/?page=${pageNum}&page_size=${PAGE_SIZE}`);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                setUsers(prevUsers => [...prevUsers, ...data.results]);
+            } else {
+                setHasMore(false);
+            }
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/api/path_to_your_activities_endpoint/');
-
-                if (!response.ok) {
-                    console.error("There was a problem fetching the data.");
-                    return;
-                }
-
-                const data = await response.json();
-                const formattedActivities = data.map(activity => ({
-                    id: activity.id.toString(),
-                    user: activity.user.name, // Adjust based on your backend's response structure
-                    activity: `${activity.name} ${activity.distance} miles`, // Assuming your activity has a 'name' and 'distance'
-                }));
-
-                setActivities(formattedActivities);
-            } catch (error) {
-                console.error("There was an error:", error);
-            }
-        };
-
-        fetchData();
+        fetchUsers();
     }, []);
+
+    const loadMoreUsers = () => {
+        if (!loading && hasMore) {
+            setPage(prevPage => prevPage + 1);
+            fetchUsers(page + 1);
+        }
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        setUsers([]);
+        setPage(1);
+        setHasMore(true);
+        fetchUsers();
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Feed</Text>
-
+            {loading && <ActivityIndicator size="large" color="#00ff00" />}
+            {error && <Text>Error loading data!</Text>}
+            
             <FlatList
-                data={activities}
-                keyExtractor={item => item.id}
+                data={users}
+                keyExtractor={item => item.pk.toString()}
                 renderItem={({ item }) => (
-                    <View style={styles.activityItem}>
-                        <Text style={styles.activityUser}>{item.user}</Text>
-                        <Text>{item.activity}</Text>
-                    </View>
+                    <TouchableOpacity style={styles.userItem} onPress={() => console.log('User details for:', item.username)}>
+                        <Text style={styles.username}>{item.username}</Text>
+                        <Text>Carbon Footprint: {item.fields.carbon_footprint}</Text>
+                        <Text>Total Points: {item.fields.total_points}</Text>
+                    </TouchableOpacity>
                 )}
+                onEndReached={loadMoreUsers}
+                onEndReachedThreshold={0.5}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
         </View>
     );
@@ -54,12 +82,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f8f8f8'
     },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    activityItem: {
+    userItem: {
         padding: 15,
         marginBottom: 10,
         backgroundColor: '#fff',
@@ -69,7 +92,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 5,
     },
-    activityUser: {
+    username: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,

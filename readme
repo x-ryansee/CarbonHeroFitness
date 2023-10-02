@@ -1,0 +1,7 @@
+client
+-npm i
+-expo start
+
+server
+-venv/bin/activate
+-python manage.py runserver

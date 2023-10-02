@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
+    path('api/carbonherofitness/', include('carbonherofitness.urls')), # assuming 'carbonherofitness' is the name of your app
 ]

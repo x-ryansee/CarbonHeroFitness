@@ -15,24 +15,30 @@ export default function ProfileScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Replace 'http://localhost:8000' with the actual address of your Django server
-    fetch('http://localhost:8000/api/user/ryan/')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    const fetchUserData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await fetch('http://127.0.0.1:8000/api/user/ryansee/', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Token ${token}`,
+            },
+          });
+  
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+  
+          const data = await response.json();
+          setUserData(data);
+        } catch (error) {
+          console.error('Error fetching data: ', error);
         }
-        return response.json();
-      })
-      .then(data => {
-        setUserData({
-          ...data,
-          // Assume you have a default placeholder image in your assets folder
-          profileImage: data.profileImage || 'path/to/default/profile_image.png',
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching data: ', error);
-      });
+      }
+    };
+  
+    fetchUserData();
   }, []);
 
   const handleLogout = () => {

@@ -1,95 +1,115 @@
 
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Button, FlatList, Alert, ProgressBarAndroid } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Button,
+  FlatList,
+  Alert,
+  ProgressBarAndroid,
+} from 'react-native';
 
 export default function ProfileScreen({ navigation }) {
-    const [userData, setUserData] = useState({
-        name: 'John Doe',
-        joinDate: '01/01/2022',
-        followers: 120,
-        following: 85,
-        profileImage: 'URL_TO_PROFILE_IMAGE',
-        stats: {
-            distanceCovered: 250, // in kilometers
-            carbonSaved: 50, // in kg
-            nextRewardAt: 100, // Next reward at 100kg
-            currentLevel: 1,
-            nextLevelAt: 200, // Next level at 200kg
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    // Replace 'http://localhost:8000' with the actual address of your Django server
+    fetch('http://localhost:8000/api/user/ryan/')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setUserData({
+          ...data,
+          // Assume you have a default placeholder image in your assets folder
+          profileImage: data.profileImage || 'path/to/default/profile_image.png',
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+  }, []);
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-        achievements: ['First Ride', '100km Club', 'Eco Hero'],
-        rewards: ['Discount Voucher', 'Eco-Friendly Badge']
-    });
-
-    const handleLogout = () => {
-        Alert.alert(
-            'Logout',
-            'Are you sure you want to logout?',
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel'
-                },
-                {
-                    text: 'Logout',
-                    onPress: () => {
-                        // Here, perform logout operations
-                        navigation.navigate('Login'); // Navigate back to Login or any relevant screen
-                    }
-                }
-            ]
-        );
-    };
-
-    const levelProgressPercentage = userData.stats.carbonSaved / userData.stats.nextLevelAt;
-    const rewardProgressPercentage = userData.stats.carbonSaved / userData.stats.nextRewardAt;
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Image source={{ uri: userData.profileImage }} style={styles.profileImage} />
-                <Text style={styles.name}>{userData.name}</Text>
-                <Text style={styles.joinDate}>Joined: {userData.joinDate}</Text>
-            </View>
-
-            <View style={styles.followContainer}>
-                <View style={styles.followBox}>
-                    <Text style={styles.followText}>Followers</Text>
-                    <Text style={styles.followCount}>{userData.followers}</Text>
-                </View>
-                <View style={styles.followBox}>
-                    <Text style={styles.followText}>Following</Text>
-                    <Text style={styles.followCount}>{userData.following}</Text>
-                </View>
-            </View>
-
-            <View style={styles.statsContainer}>
-                <Text style={styles.statsTitle}>Statistics</Text>
-                <Text style={styles.statItem}>Total Distance Covered: {userData.stats.distanceCovered} km</Text>
-                <Text style={styles.statItem}>Total Carbon Saved: {userData.stats.carbonSaved} kg</Text>
-
-                <Text style={styles.progressText}>Level Progress:</Text>
-                <ProgressBarAndroid style={styles.progressBar} progress={levelProgressPercentage} color="#4CAF50" />
-                <Text style={styles.progressInfo}>Reach {userData.stats.nextLevelAt} kg for the next level!</Text>
-
-                <Text style={styles.progressText}>Reward Progress:</Text>
-                <ProgressBarAndroid style={styles.progressBar} progress={rewardProgressPercentage} color="#2196F3" />
-                <Text style={styles.progressInfo}>Save up to {userData.stats.nextRewardAt} kg for the next reward!</Text>
-            </View>
-
-            <View style={styles.achievementsContainer}>
-                <Text style={styles.achievementsTitle}>Achievements</Text>
-                <FlatList
-                    data={userData.achievements}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => <Text style={styles.achievementItem}>{item}</Text>}
-                />
-            </View>
-
-            <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
-            <Button title="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
-            <Button title="Logout" onPress={handleLogout} color="red" />
-        </View>
+        {
+          text: 'Logout',
+          onPress: () => {
+            // Here, perform logout operations
+            navigation.navigate('Login'); // Navigate back to Login or any relevant screen
+          },
+        },
+      ]
     );
+  };
+
+  // Check for userData before trying to calculate progress
+  const levelProgressPercentage = userData ? userData.stats.carbonSaved / userData.stats.nextLevelAt : 0;
+  const rewardProgressPercentage = userData ? userData.stats.carbonSaved / userData.stats.nextRewardAt : 0;
+
+  if (!userData) {
+    return <Text>Loading...</Text>;
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Image source={{ uri: userData.profileImage }} style={styles.profileImage} />
+        <Text style={styles.name}>{userData.name}</Text>
+        <Text style={styles.joinDate}>Joined: {userData.joinDate}</Text>
+      </View>
+
+      <View style={styles.followContainer}>
+        <View style={styles.followBox}>
+          <Text style={styles.followText}>Followers</Text>
+          <Text style={styles.followCount}>{userData.followers}</Text>
+        </View>
+        <View style={styles.followBox}>
+          <Text style={styles.followText}>Following</Text>
+          <Text style={styles.followCount}>{userData.following}</Text>
+        </View>
+      </View>
+
+      <View style={styles.statsContainer}>
+        <Text style={styles.statsTitle}>Statistics</Text>
+        <Text style={styles.statItem}>Total Distance Covered: {userData.stats.distanceCovered} km</Text>
+        <Text style={styles.statItem}>Total Carbon Saved: {userData.stats.carbonSaved} kg</Text>
+
+        <Text style={styles.progressText}>Level Progress:</Text>
+        <ProgressBarAndroid style={styles.progressBar} progress={levelProgressPercentage} color="#4CAF50" />
+        <Text style={styles.progressInfo}>Reach {userData.stats.nextLevelAt} kg for the next level!</Text>
+
+        <Text style={styles.progressText}>Reward Progress:</Text>
+        <ProgressBarAndroid style={styles.progressBar} progress={rewardProgressPercentage} color="#2196F3" />
+        <Text style={styles.progressInfo}>Save up to {userData.stats.nextRewardAt} kg for the next reward!</Text>
+      </View>
+
+      <View style={styles.achievementsContainer}>
+        <Text style={styles.achievementsTitle}>Achievements</Text>
+        <FlatList
+          data={userData.achievements}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text style={styles.achievementItem}>{item}</Text>}
+        />
+      </View>
+
+      <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
+      <Button title="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
+      <Button title="Logout" onPress={handleLogout} color="red" />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

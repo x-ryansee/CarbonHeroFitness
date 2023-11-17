@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Button, FlatList, Alert } from 'react-native';
+
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Button, FlatList, Alert, ProgressBarAndroid } from 'react-native';
 
 export default function ProfileScreen({ navigation }) {
     const [userData, setUserData] = useState({
@@ -11,8 +12,12 @@ export default function ProfileScreen({ navigation }) {
         stats: {
             distanceCovered: 250, // in kilometers
             carbonSaved: 50, // in kg
+            nextRewardAt: 100, // Next reward at 100kg
+            currentLevel: 1,
+            nextLevelAt: 200, // Next level at 200kg
         },
-        achievements: ['First Ride', '100km Club', 'Eco Hero']
+        achievements: ['First Ride', '100km Club', 'Eco Hero'],
+        rewards: ['Discount Voucher', 'Eco-Friendly Badge']
     });
 
     const handleLogout = () => {
@@ -35,6 +40,9 @@ export default function ProfileScreen({ navigation }) {
         );
     };
 
+    const levelProgressPercentage = userData.stats.carbonSaved / userData.stats.nextLevelAt;
+    const rewardProgressPercentage = userData.stats.carbonSaved / userData.stats.nextRewardAt;
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -56,8 +64,16 @@ export default function ProfileScreen({ navigation }) {
 
             <View style={styles.statsContainer}>
                 <Text style={styles.statsTitle}>Statistics</Text>
-                <Text>Total Distance Covered: {userData.stats.distanceCovered} km</Text>
-                <Text>Total Carbon Saved: {userData.stats.carbonSaved} kg</Text>
+                <Text style={styles.statItem}>Total Distance Covered: {userData.stats.distanceCovered} km</Text>
+                <Text style={styles.statItem}>Total Carbon Saved: {userData.stats.carbonSaved} kg</Text>
+
+                <Text style={styles.progressText}>Level Progress:</Text>
+                <ProgressBarAndroid style={styles.progressBar} progress={levelProgressPercentage} color="#4CAF50" />
+                <Text style={styles.progressInfo}>Reach {userData.stats.nextLevelAt} kg for the next level!</Text>
+
+                <Text style={styles.progressText}>Reward Progress:</Text>
+                <ProgressBarAndroid style={styles.progressBar} progress={rewardProgressPercentage} color="#2196F3" />
+                <Text style={styles.progressInfo}>Save up to {userData.stats.nextRewardAt} kg for the next reward!</Text>
             </View>
 
             <View style={styles.achievementsContainer}>
@@ -77,64 +93,85 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f8f8f8',
+    // Existing styles...
+    statItem: {
+        fontSize: 18,
+        marginBottom: 5,
     },
-    header: {
-        alignItems: 'center',
-        marginBottom: 20,
+    progressText: {
+        fontSize: 18,
+        fontWeight: '500',
+        marginTop: 10,
     },
-    profileImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 10,
+    progressBar: {
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: '#e0e0e0',
+        marginBottom: 5,
     },
-    name: {
-        fontSize: 22,
-        fontWeight: 'bold',
-    },
-    joinDate: {
+    progressInfo: {
         fontSize: 16,
         color: 'gray',
     },
-    followContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-    },
-    followBox: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    followText: {
-        fontSize: 18,
-    },
-    followCount: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    statsContainer: {
-        marginBottom: 20,
-    },
-    statsTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    achievementsContainer: {
-        marginBottom: 20,
-    },
-    achievementsTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    achievementItem: {
-        fontSize: 18,
-        padding: 5,
-    }
+
+        container: {
+            flex: 1,
+            padding: 20,
+            backgroundColor: '#f8f8f8',
+        },
+        header: {
+            alignItems: 'center',
+            marginBottom: 20,
+        },
+        profileImage: {
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            marginBottom: 10,
+        },
+        name: {
+            fontSize: 22,
+            fontWeight: 'bold',
+        },
+        joinDate: {
+            fontSize: 16,
+            color: 'gray',
+        },
+        followContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+        },
+        followBox: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        followText: {
+            fontSize: 18,
+        },
+        followCount: {
+            fontSize: 20,
+            fontWeight: 'bold',
+        },
+        statsContainer: {
+            marginBottom: 20,
+        },
+        statsTitle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginBottom: 10,
+        },
+        achievementsContainer: {
+            marginBottom: 20,
+        },
+        achievementsTitle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginBottom: 10,
+        },
+        achievementItem: {
+            fontSize: 18,
+            padding: 5,
+        }
 });

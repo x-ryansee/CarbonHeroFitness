@@ -1,12 +1,15 @@
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
+from django.core.files.storage import FileSystemStorage
+
 from .models import (User, Activity, UserActivity, Goal, Challenge, UserChallenge, 
                      Badge, Reward, UserReward, Friend, Group, Content, OffsetProject, UserContribution)
 from .serializers import (UserSerializer, ActivitySerializer, UserActivitySerializer, GoalSerializer, ChallengeSerializer,
                           UserChallengeSerializer, BadgeSerializer, RewardSerializer, UserRewardSerializer, FriendSerializer,
                           GroupSerializer, ContentSerializer, OffsetProjectSerializer, UserContributionSerializer)
-
-# Authentication Views would typically be handled by DRF's built-in views, e.g., TokenObtainPairView for JWT authentication.
 
 # Activity Views
 class ActivityViewSet(viewsets.ModelViewSet):
@@ -43,6 +46,20 @@ class DashboardView(generics.RetrieveAPIView):
         }
         return Response(data)
 
-# Remember to set up the serializers.py appropriately for the views to function.
-# The serializers will specify how the data is transformed and what fields are included in the response.
+class UploadProfilePictureView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request, format=None):
+        file_obj = request.data['file']
+        fs = FileSystemStorage()
+        filename = fs.save(file_obj.name, file_obj)
+        uploaded_file_url = fs.url(filename)
+
+        user = request.user
+        user.profile_picture = filename
+        user.save()
+
+        return Response({'url': uploaded_file_url}, status=status.HTTP_201_CREATED)
+
+# ... Rest of your views ...

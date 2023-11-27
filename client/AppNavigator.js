@@ -34,7 +34,6 @@ function BottomTabsNavigator() {
   );
 }
 
-// Main App Navigation (with both stack and bottom tabs)
 function AppNavigator() {
   return (
     <Stack.Navigator initialRouteName="Login">

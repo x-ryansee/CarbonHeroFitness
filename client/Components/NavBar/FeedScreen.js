@@ -7,7 +7,7 @@ export default function FeedScreen() {
     useEffect(() => {
         // Fetch activities data here
 
-        // This is mock data. Replace with an API call to fetch real data.
+        // This is mock data. Replace with an API call to fetch real data
         const fetchData = async () => {
             const mockActivities = [
                 { id: '1', user: 'John Doe', activity: 'Cycled 5 miles' },

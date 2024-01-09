@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,67 +6,34 @@ import {
   Image,
   Button,
   FlatList,
-  Alert,
   ProgressBarAndroid,
 } from 'react-native';
 
 export default function ProfileScreen({ navigation }) {
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        try {
-          const response = await fetch('http://127.0.0.1:8000/api/user/ryansee/', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Token ${token}`,
-            },
-          });
-  
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-  
-          const data = await response.json();
-          setUserData(data);
-        } catch (error) {
-          console.error('Error fetching data: ', error);
-        }
-      }
-    };
-  
-    fetchUserData();
-  }, []);
-
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          onPress: () => {
-            // Here, perform logout operations
-            navigation.navigate('Login'); // Navigate back to Login or any relevant screen
-          },
-        },
-      ]
-    );
+  // Hardcoded user data
+  const userData = {
+    profileImage: 'https://via.placeholder.com/100',
+    name: 'Ryan See',
+    joinDate: '2023-08-31',
+    followers: 120,
+    following: 75,
+    stats: {
+      distanceCovered: 250, // in km
+      carbonSaved: 15, // in kg
+      nextLevelAt: 20, // in kg
+      nextRewardAt: 30, // in kg
+    },
+    achievements: ['First 10km Run', '5 Days Streak', '10kg CO2 Saved'],
   };
 
-  // Check for userData before trying to calculate progress
-  const levelProgressPercentage = userData ? userData.stats.carbonSaved / userData.stats.nextLevelAt : 0;
-  const rewardProgressPercentage = userData ? userData.stats.carbonSaved / userData.stats.nextRewardAt : 0;
+  // Calculate progress percentages
+  const levelProgressPercentage = userData.stats.carbonSaved / userData.stats.nextLevelAt;
+  const rewardProgressPercentage = userData.stats.carbonSaved / userData.stats.nextRewardAt;
 
-  if (!userData) {
-    return <Text>Loading...</Text>;
-  }
+  const handleLogout = () => {
+    // Logout logic here
+    navigation.navigate('Login');
+  };
 
   return (
     <View style={styles.container}>
@@ -119,85 +85,85 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    // Existing styles...
-    statItem: {
-        fontSize: 18,
-        marginBottom: 5,
-    },
-    progressText: {
-        fontSize: 18,
-        fontWeight: '500',
-        marginTop: 10,
-    },
-    progressBar: {
-        height: 20,
-        borderRadius: 10,
-        backgroundColor: '#e0e0e0',
-        marginBottom: 5,
-    },
-    progressInfo: {
-        fontSize: 16,
-        color: 'gray',
-    },
+  // Existing styles...
+  statItem: {
+      fontSize: 18,
+      marginBottom: 5,
+  },
+  progressText: {
+      fontSize: 18,
+      fontWeight: '500',
+      marginTop: 10,
+  },
+  progressBar: {
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: '#e0e0e0',
+      marginBottom: 5,
+  },
+  progressInfo: {
+      fontSize: 16,
+      color: 'gray',
+  },
 
-        container: {
-            flex: 1,
-            padding: 20,
-            backgroundColor: '#f8f8f8',
-        },
-        header: {
-            alignItems: 'center',
-            marginBottom: 20,
-        },
-        profileImage: {
-            width: 100,
-            height: 100,
-            borderRadius: 50,
-            marginBottom: 10,
-        },
-        name: {
-            fontSize: 22,
-            fontWeight: 'bold',
-        },
-        joinDate: {
-            fontSize: 16,
-            color: 'gray',
-        },
-        followContainer: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: 20,
-        },
-        followBox: {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        followText: {
-            fontSize: 18,
-        },
-        followCount: {
-            fontSize: 20,
-            fontWeight: 'bold',
-        },
-        statsContainer: {
-            marginBottom: 20,
-        },
-        statsTitle: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            marginBottom: 10,
-        },
-        achievementsContainer: {
-            marginBottom: 20,
-        },
-        achievementsTitle: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            marginBottom: 10,
-        },
-        achievementItem: {
-            fontSize: 18,
-            padding: 5,
-        }
+      container: {
+          flex: 1,
+          padding: 20,
+          backgroundColor: '#f8f8f8',
+      },
+      header: {
+          alignItems: 'center',
+          marginBottom: 20,
+      },
+      profileImage: {
+          width: 100,
+          height: 100,
+          borderRadius: 50,
+          marginBottom: 10,
+      },
+      name: {
+          fontSize: 22,
+          fontWeight: 'bold',
+      },
+      joinDate: {
+          fontSize: 16,
+          color: 'gray',
+      },
+      followContainer: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginBottom: 20,
+      },
+      followBox: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+      },
+      followText: {
+          fontSize: 18,
+      },
+      followCount: {
+          fontSize: 20,
+          fontWeight: 'bold',
+      },
+      statsContainer: {
+          marginBottom: 20,
+      },
+      statsTitle: {
+          fontSize: 20,
+          fontWeight: 'bold',
+          marginBottom: 10,
+      },
+      achievementsContainer: {
+          marginBottom: 20,
+      },
+      achievementsTitle: {
+          fontSize: 20,
+          fontWeight: 'bold',
+          marginBottom: 10,
+      },
+      achievementItem: {
+          fontSize: 18,
+          padding: 5,
+      }
 });

@@ -1,35 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    // Keep the username and password states, but they won't be used for validation
+    const [username, setUsername] = React.useState('');
+    const [password, setPassword] = React.useState('');
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/auth/token/login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                }),
-            });
-    
-            const data = await response.json();
-    
-            if (response.status === 200) {
-                // Successfully logged in
-                await AsyncStorage.setItem('token', data.auth_token);
-                navigation.navigate('MainApp');
-            } else {
-                alert('Invalid username or password');
-            }
+            // Directly navigate to the MainApp screen without using username and password
+            await AsyncStorage.setItem('token', 'mock-token'); // Mock token for demonstration
+            navigation.navigate('MainApp');
         } catch (error) {
-            console.error("There was an error logging in", error);
+            console.error("There was an error during the login process", error);
             alert('Error logging in. Please try again.');
         }
     };

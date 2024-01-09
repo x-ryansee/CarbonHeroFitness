@@ -74,38 +74,42 @@ export default function RecordScreen() {
                     longitudeDelta: 0.0421,
                 }}
             >
-                {route.length > 0 && <Polyline coordinates={route} />}
+                {route.length > 0 && <Polyline coordinates={route} strokeWidth={4} strokeColor="#1E88E5" />}
             </MapView>
 
-            {/* Transport Selection */}
-            <View style={styles.transportSelection}>
-                <TouchableOpacity 
-                    style={[styles.transportButton, transport === 'walk' ? styles.active : {}]}
-                    onPress={() => setTransport('walk')}
-                >
-                    <Text style={styles.buttonText}>Walk</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.transportButton, transport === 'bike' ? styles.active : {}]}
-                    onPress={() => setTransport('bike')}
-                >
-                    <Text style={styles.buttonText}>Bike</Text>
-                </TouchableOpacity>
+            <View style={styles.infoPanel}>
+                {/* Transport Selection */}
+                <View style={styles.transportSelection}>
+                    <TouchableOpacity 
+                        style={[styles.transportButton, transport === 'walk' ? styles.active : {}]}
+                        onPress={() => setTransport('walk')}
+                    >
+                        <Text style={styles.buttonText}>Walk</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={[styles.transportButton, transport === 'bike' ? styles.active : {}]}
+                        onPress={() => setTransport('bike')}
+                    >
+                        <Text style={styles.buttonText}>Bike</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {transport && (
+                    <TouchableOpacity 
+                        style={[styles.actionButton, tracking ? styles.stopButton : styles.startButton]}
+                        onPress={() => { tracking ? stopTracking() : startTracking() }}
+                    >
+                        <Text style={styles.actionButtonText}>{tracking ? "Stop Tracking" : "Start Tracking"}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {distance !== 0 && (
+                    <View style={styles.distanceContainer}>
+                        <Text style={styles.distanceText}>Distance Travelled: {distance.toFixed(2)} km</Text>
+                        <Text style={styles.distanceText}>Estimated Carbon Saved: {(distance * 0.2).toFixed(2)} kg</Text>
+                    </View>
+                )}
             </View>
-
-            {transport && (
-                <Button 
-                    title={tracking ? "Stop Tracking" : "Start Tracking"} 
-                    onPress={() => { tracking ? stopTracking() : startTracking() }} 
-                />
-            )}
-
-            {distance !== 0 && (
-                <>
-                    <Text>Distance Travelled: {distance.toFixed(2)} km</Text>
-                    <Text>Estimated Carbon Saved: {(distance * 0.2).toFixed(2)} kg</Text>
-                </>
-            )}
         </View>
     );
 }
@@ -113,16 +117,20 @@ export default function RecordScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
     },
     map: {
-        width: '100%',
-        height: '70%',
+        flex: 5,
+    },
+    infoPanel: {
+        flex: 2,
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        padding: 10,
     },
     transportSelection: {
         flexDirection: 'row',
-        marginVertical: 10,
+        justifyContent: 'center',
     },
     transportButton: {
         padding: 10,
@@ -138,5 +146,29 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#333',
         fontSize: 16,
+    },
+    actionButton: {
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        width: 200,
+    },
+    startButton: {
+        backgroundColor: '#4CAF50',
+    },
+    stopButton: {
+        backgroundColor: '#F44336',
+    },
+    actionButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    distanceContainer: {
+        alignItems: 'center',
+    },
+    distanceText: {
+        fontSize: 16,
+        color: '#555',
     }
 });
